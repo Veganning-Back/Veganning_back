@@ -23,3 +23,20 @@ export const getOpenCloseColumns = (day) => {
         default: return { open: 'mon_open', close: 'mon_close' };
     }
 }
+
+//d+Day 계산
+export const calculateDplusDay = (dateString) => {
+    const startDate = new Date(dateString);
+    const today = new Date();
+    const timeDifference = today - startDate;
+    const dayDifference = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
+    return dayDifference;
+};
+
+//240805 형태로 변환
+export const formatDate = (date) => {
+    const yy = String(date.getFullYear()).slice(2);
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const dd = String(date.getDate()).padStart(2, '0');
+    return yy + mm + dd;
+};
