@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';  // cors 모듈 import
 import { homeRouter } from './src/routes/home.route.js';
-
+import { storeRouter } from './src/routes/store.route.js';
 
 const app = express();
 
@@ -15,12 +15,13 @@ app.use(express.urlencoded({ extended: false })); // 단순 객체 문자열 형
 //homeTab기능
 app.use('/home', homeRouter);
 
+//STORE 관련기능
+app.use('/stores', storeRouter);
 
-
-app.use((req, res, next) => {
-    const err = new BaseError(status.NOT_FOUND);
-    next(err);
-});
+// app.use((req, res, next) => {
+//     const err = new BaseError(status.NOT_FOUND);
+//     next(err);
+// });
 
 // 포트를 `app.get('port')`에서 가져옵니다.
 app.listen(app.get('port'), () => {

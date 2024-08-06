@@ -1,7 +1,7 @@
 
 import { showHotStoresResponseDTO, recommendRecipesResponseDTO } from "../dtos/home.dto.js";
 import {getHotStoresData, getRecommendRecipe} from "../models/home.dao.js";
-import { formatDate } from "../models/home.module.js";
+import { formatDate } from "../models/module.js";
 //dao : 쿼리문 조작   dto : 프론트에 적절한 형태로 데이터 조작
 
 //(3.1.1 / 3.1.2 / 3.1.3)

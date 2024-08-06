@@ -5,7 +5,7 @@ export const getUserData = () => `
     WHERE u.id = ?;
 `;
 
-//r.carbohydrate, r.sugar, r.protein, r.fat, r.user_id
+//필터 거친 추천레시피 1개 리턴
 export const getRecommendationQuery = (placeholders, ingredientCount) => `
     SELECT r.id, r.name, r.image 
     FROM Recipe r
@@ -14,7 +14,7 @@ export const getRecommendationQuery = (placeholders, ingredientCount) => `
     GROUP BY r.id
     HAVING COUNT(DISTINCT i.name) = ${ingredientCount};
 `;
-
+//랜덤 레시피 1개 리턴
 export const getRandomRecipe = () => `
     SELECT id, name, image FROM recipe
     ORDER BY RAND()

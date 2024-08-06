@@ -1,7 +1,7 @@
 import { pool } from "../../config/db.config.js";
 import { status } from "../../config/response.status.js";
 import { getHotStoresQuery, getUserData, getRecommendationQuery, getRandomRecipe } from "./home.sql.js";
-import {isStoreOpen, getOpenCloseColumns} from "./home.module.js";
+import {isStoreOpen, getOpenCloseColumns} from "./module.js";
 
 // (3.1.4)세이브닝 개수가 가장 많은 4개의 식당 정보 리턴
 export const getHotStoresData = async () => {
