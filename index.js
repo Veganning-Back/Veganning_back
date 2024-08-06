@@ -29,10 +29,13 @@ app.use(express.json());
 
 // router setting
 app.use('/myPage', myPageRouter);
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+
 
 // // 포트를 `app.get('port')`에서 가져옵니다.
 // app.listen(app.get('port'), () => {
