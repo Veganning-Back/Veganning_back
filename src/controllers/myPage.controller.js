@@ -127,3 +127,13 @@ export const updateUser = async (req, res) => {
         connection.release(); // 커넥션 해제
     }
 };
+
+export const savening_Recipe = (req, res) => {
+    //res.send(response(status.SUCCESS, getmyPageData()));
+    res.send('savening_Recipe is working!');
+};
+
+export const savening_Restaurant = (req, res) => {
+    //res.send(response(status.SUCCESS, getmyPageData()));
+    res.send('savening_Restaurant is working!');
+};
