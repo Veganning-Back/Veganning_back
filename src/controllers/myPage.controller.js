@@ -6,7 +6,8 @@ import { response } from '../../config/response.js';
 import db from '../../config/db.config.js';
 import { getUserDataById } from '../services/myPage.service.js';
 import { getUserSave_Res } from '../models/user.sql.js';  // SQL 쿼리 가져오기
-import { getUserSave_Rec } from '../models/user.sql.js';  // SQL 쿼리 가져오기
+import { getUserSave_Rec } from '../models/user.sql.js';  
+import { deleteSavedRecipeQuery } from '../models/user.sql.js';  
 
 export const myPageTest = (req, res) => {
     //res.send(response(status.SUCCESS, getmyPageData()));
@@ -136,6 +137,7 @@ export const savening_Recipe = async (req, res) => {
     try {
         // SQL 쿼리를 사용하여 데이터베이스에서 정보 조회
         const [recipes] = await db.query(getUserSave_Rec, [userId]);
+
         // 식단 개수 계산
         const recipeCount = recipes.length;
 
@@ -144,14 +146,12 @@ export const savening_Recipe = async (req, res) => {
             count: recipeCount,
             recipes: recipes
         });
-        // 조회된 정보를 JSON으로 클라이언트에 응답
-        res.json(recipes);
+
     } catch (error) {
         console.error('Error fetching saved recipes:', error);
         res.status(500).json({ error: 'Failed to fetch saved recipes' });
     }
 };
-
 
 // 사용자가 저장한 식당 정보를 가져오는 함수
 export const savening_Restaurant = async (req, res) => {
@@ -172,5 +172,43 @@ export const savening_Restaurant = async (req, res) => {
     } catch (error) {
         console.error('Error fetching saved restaurants:', error);
         res.status(500).json({ error: 'Failed to fetch saved restaurants' });
+    }
+};
+
+
+export const deleteSavedRecipe = async (req, res) => {
+    const userId = req.params.id;  // URL에서 사용자 ID와 레시피 ID 가져오기
+    const recipeId = req.params.recipeId;
+    try {
+        // 데이터베이스에서 해당 레시피 삭제
+        const [result] = await db.query(deleteSavedRecipeQuery, [userId, recipeId]);
+
+        if (result.affectedRows > 0) {
+            // 삭제가 성공한 경우
+            res.status(200).json({
+                status: 200,
+                success: true,
+                message: '세이브닝 삭제에 성공했습니다.',
+                data: {}
+            });
+        } else {
+            // 삭제할 데이터가 없는 경우
+            res.status(404).json({
+                status: 404,
+                success: false,
+                message: '해당 레시피를 찾을 수 없습니다.',
+                data: {}
+            });
+        }
+    } catch (error) {
+        console.error('Error deleting saved recipe:', error);
+        if (!res.headersSent) {
+            res.status(500).json({
+                status: 500,
+                success: false,
+                message: '레시피 삭제에 실패했습니다.',
+                data: {}
+            });
+        }
     }
 };
