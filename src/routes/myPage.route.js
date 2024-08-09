@@ -14,3 +14,4 @@ myPageRouter.get('/:id/savening_Recipe', savening_Recipe);
 myPageRouter.get('/:id/savening_Restaurant', savening_Restaurant);
 myPageRouter.delete('/:id/savening_Recipe/:recipeId', deleteSavedRecipe);
 myPageRouter.delete('/:id/savening_Restaurant/:storeId', deleteSavedRestaurant);
+

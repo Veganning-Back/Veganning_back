@@ -2,6 +2,7 @@ import express from 'express'          // ES6
 import cors from 'cors';  // cors 모듈 import
 import { myPageRouter } from './src/routes/myPage.route.js';
 import db from './config/db.config.js';
+import { authRouter } from './src/routes/auth.routes.js';
 
 const app = express();
 
@@ -29,6 +30,7 @@ app.use(express.json());
 
 // router setting
 app.use('/myPage', myPageRouter);
+app.use('/auth', authRouter);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
