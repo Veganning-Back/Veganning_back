@@ -7,7 +7,9 @@ import db from '../../config/db.config.js';
 import { getUserDataById } from '../services/myPage.service.js';
 import { getUserSave_Res } from '../models/user.sql.js';  // SQL 쿼리 가져오기
 import { getUserSave_Rec } from '../models/user.sql.js';  
-import { deleteSavedRecipeQuery } from '../models/user.sql.js';  
+import { deleteSavedRecipeQuery } from '../models/user.sql.js';
+import { deleteSavedRestaurantQuery } from '../models/user.sql.js';  
+
 
 export const myPageTest = (req, res) => {
     //res.send(response(status.SUCCESS, getmyPageData()));
@@ -207,6 +209,43 @@ export const deleteSavedRecipe = async (req, res) => {
                 status: 500,
                 success: false,
                 message: '레시피 삭제에 실패했습니다.',
+                data: {}
+            });
+        }
+    }
+};
+
+export const deleteSavedRestaurant = async (req, res) => {
+    const userId = req.params.id;  // URL에서 사용자 ID와 식당 ID 가져오기
+    const storeId = req.params.storeId;
+    try {
+        // 데이터베이스에서 해당 식당 삭제
+        const [result] = await db.query(deleteSavedRestaurantQuery, [userId, storeId]);
+
+        if (result.affectedRows > 0) {
+            // 삭제가 성공한 경우
+            res.status(200).json({
+                status: 200,
+                success: true,
+                message: '세이브닝 삭제에 성공했습니다.',
+                data: {}
+            });
+        } else {
+            // 삭제할 데이터가 없는 경우
+            res.status(404).json({
+                status: 404,
+                success: false,
+                message: '해당 식당을 찾을 수 없습니다.',
+                data: {}
+            });
+        }
+    } catch (error) {
+        console.error('Error deleting saved restaurant:', error);
+        if (!res.headersSent) {
+            res.status(500).json({
+                status: 500,
+                success: false,
+                message: '식당 삭제에 실패했습니다.',
                 data: {}
             });
         }
