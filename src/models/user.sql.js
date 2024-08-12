@@ -14,3 +14,5 @@ export const insertUserSql = `
 `;
 
 export const getUserByEmail = 'SELECT * FROM user WHERE email = ?';
+
+export const getUserRecipesQuery = 'SELECT * FROM recipe WHERE user_id = ?';

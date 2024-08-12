@@ -9,7 +9,7 @@ import { getUserSave_Res } from '../models/user.sql.js';  // SQL 쿼리 가져�
 import { getUserSave_Rec } from '../models/user.sql.js';  
 import { deleteSavedRecipeQuery } from '../models/user.sql.js';
 import { deleteSavedRestaurantQuery } from '../models/user.sql.js';  
-
+import { getUserRecipesQuery } from '../models/user.sql.js';
 
 export const myPageTest = (req, res) => {
     //res.send(response(status.SUCCESS, getmyPageData()));
@@ -249,5 +249,50 @@ export const deleteSavedRestaurant = async (req, res) => {
                 data: {}
             });
         }
+    }
+};
+
+
+//내 공모 리스트
+export const getUserRecipes = async (req, res) => {
+    const userId = req.params.id; // URL에서 사용자 ID를 가져옴
+
+    try {
+        // 데이터베이스에서 사용자 ID로 레시피 조회
+        const [recipes] = await db.query(getUserRecipesQuery, [userId]);
+
+        if (recipes.length === 0) {
+            return res.status(404).json({
+                status: 404,
+                success: false,
+                message: 'No recipes found for this user.',
+                data: {
+                    totalRecipes: 0,  // 레시피 개수를 0으로 설정
+                    recipes: []       // 빈 배열 반환
+                }
+            });
+        }
+
+        // 총 레시피 개수 계산
+        const totalRecipes = recipes.length;
+
+        // 조회된 레시피 목록을 반환
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: 'User recipes retrieved successfully.',
+            data: {
+                totalRecipes, // 총 레시피 개수
+                recipes       // 레시피 리스트
+            }
+        });
+    } catch (error) {
+        console.error('Database error:', error);
+        res.status(500).json({
+            status: 500,
+            success: false,
+            message: 'Server error.',
+            data: {}
+        });
     }
 };
