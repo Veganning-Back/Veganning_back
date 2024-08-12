@@ -19,6 +19,10 @@ export const status = {
     NICKNAME_NOT_EXIST: {status: StatusCodes.BAD_REQUEST, "isSuccess": false, "code": "MEMBER4002", "message": "닉네임은 필수입니다."},
 
     // article err
-    ARTICLE_NOT_FOUND: {status: StatusCodes.NOT_FOUND, "isSuccess": false, "code": "ARTICLE4001", "message": "게시글이 없습니다."}
+    ARTICLE_NOT_FOUND: {status: StatusCodes.NOT_FOUND, "isSuccess": false, "code": "ARTICLE4001", "message": "게시글이 없습니다."},
+//-----------------------------------------------------------------------------------------------------------------------------------------------
 
+
+//기존회원 오류
+  EXISTED_USER: {status: StatusCodes.EXISTED_USER, "isSuccess": false, "code": 4000, "message": "기존회원입니다."}
 };

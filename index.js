@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';  // cors 모듈 import
 import { homeRouter } from './src/routes/home.route.js';
 import { storeRouter } from './src/routes/store.route.js';
+//import { authRouter } from './src/routes/auth.route.js';
 
 const app = express();
 
@@ -18,10 +19,14 @@ app.use('/home', homeRouter);
 //STORE 관련기능
 app.use('/stores', storeRouter);
 
-// app.use((req, res, next) => {
-//     const err = new BaseError(status.NOT_FOUND);
-//     next(err);
-// });
+//회원가입, 로그인기능
+// app.use('/auth', authRouter);
+
+
+app.use((req, res, next) => {
+    console.log('404 Error - Page not found');
+    res.status(404).send('Page not found');
+});
 
 // 포트를 `app.get('port')`에서 가져옵니다.
 app.listen(app.get('port'), () => {

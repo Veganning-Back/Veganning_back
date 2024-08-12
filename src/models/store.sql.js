@@ -1,3 +1,4 @@
+//(3.4 / 3.4.2 / 3.4.3)
 export const getHotStoreQuery = (cursorId, regions, type, { open, close }) => {
     let query = `
         SELECT s.id, s.name, s.address, o.${open} AS open, o.${close} AS close, r.avg AS rating, s.image
@@ -32,3 +33,104 @@ export const getHotStoreQuery = (cursorId, regions, type, { open, close }) => {
     
     return query;
 };
+
+//-------------------------------------------------------------
+
+//평균별점, 비건타입, hot태그, 주소, 영업시간 ,홈페이지, 연락처
+export const getStoreInfoQuery = `
+    SELECT
+        s.name,
+        sr.avg,
+        s.type,
+        s.address,
+        s.link,
+        s.contact,
+        COUNT(r.id) AS review_count,
+        o.mon_open, o.mon_close,
+        o.tue_open, o.tue_close,
+        o.wed_open, o.wed_close,
+        o.thu_open, o.thu_close,
+        o.fri_open, o.fri_close,
+        o.sat_open, o.sat_close,
+        o.sun_open, o.sun_close
+    FROM store s
+    LEFT JOIN store_rating sr ON s.id = sr.store_id
+    LEFT JOIN open o ON s.id = o.store_id
+    LEFT JOIN store_review r ON s.id = r.store_id
+    WHERE s.id = ?
+    GROUP BY s.id, sr.avg, s.type, s.address, s.link, s.contact,
+             o.mon_open, o.mon_close, o.tue_open, o.tue_close,
+             o.wed_open, o.wed_close, o.thu_open, o.thu_close,
+             o.fri_open, o.fri_close, o.sat_open, o.sat_close,
+             o.sun_open, o.sun_close;
+`;
+
+// 가게 리뷰 사진을 가져오는 쿼리
+export const getStoreReviewPhotoQuery = `
+    SELECT image
+    FROM store_review
+    WHERE store_id = ? AND image IS NOT NULL
+    LIMIT 6
+`;
+
+
+// 가게 메뉴를 가져오는 쿼리
+export const getStoreMenuQuery = `
+    SELECT menu, price
+    FROM menu
+    WHERE store_id = ?`;
+
+export const getIsHotQuery = `
+    SELECT COUNT(*) as count
+    FROM store_savning
+    WHERE store_id = ?`;
+//--------------------------------------------------------------
+
+
+//식당리뷰페이지 별점정보
+//(3.7.2)
+export const getStoreRateQuery = `
+    SELECT 
+        avg AS average,
+        five,
+        four,
+        three,
+        two,
+        one
+    FROM 
+        store_rating
+    WHERE 
+        store_id = ?
+`;
+
+export const getReviewCountQuery = `
+SELECT 
+    COUNT(*) AS review_count
+FROM 
+    store_review
+WHERE 
+    store_id = ?;
+`;
+// SELECT 
+//         review_count
+//     FROM 
+//         store
+//     WHERE 
+//         id = ?
+
+
+//-----------------------------------------------------------------------------
+//식당리뷰등록
+//(3.7.3)
+// 리뷰 추가 쿼리
+export const addReviewQuery = `
+    INSERT INTO store_review (store_id, user_id, image, rating, body, created_at)
+    VALUES (?, ?, ?, ?, ?, NOW())
+`;
+
+// 가게 평점 업데이트 쿼리
+export const updateStoreRatingQuery = `
+    UPDATE store_rating
+    SET avg = ?
+    WHERE store_id = ?
+`;
