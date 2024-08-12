@@ -12,3 +12,5 @@ export const insertUserSql = `
     INSERT INTO user (email, password, name, start_vegan, signupDate)
     VALUES (?, ?, ?, ?, CURRENT_DATE);
 `;
+
+export const getUserByEmail = 'SELECT * FROM user WHERE email = ?';
