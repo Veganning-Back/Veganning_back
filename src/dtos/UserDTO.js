@@ -1,4 +1,3 @@
-// 사용자 정보를 클라이언트로 전송하기 위한 DTO
 export const UserDTO = (user) => {
     return {
         userId: user.userId,

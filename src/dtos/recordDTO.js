@@ -1,4 +1,3 @@
-// 일일 기록을 클라이언트로 전송하기 위한 DTO
 export const DailyRecordDTO = (record) => {
     return {
         id: record.id,

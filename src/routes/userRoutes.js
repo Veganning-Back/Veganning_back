@@ -1,12 +1,20 @@
 import express from 'express';
-import { getUser, updateUserTargets } from '../controllers/userController.js';
+import { getUser } from '../controllers/userController.js';
+import { getUserChallengeByDate } from '../controllers/ChallengeController.js';
+import { updateUserChallenge } from '../controllers/ChallengeController.js';
+import { getDailyRecordByDate } from '../controllers/recordController.js';
 
 const router = express.Router();
 
-// 사용자의 정보를 가져오는 API 엔드포인트 (GET /users/:userId)
+// 사용자의 정보
 router.get('/:userId', getUser);
 
-// 사용자의 목표 영양소 섭취량을 업데이트하는 API 엔드포인트 (POST /users/challenge/:userId)
-router.post('/challenge/:userId', updateUserTargets);
+// 특정 날짜의 챌린지 정보가져옴
+router.get('/:userId/challenge/:date', getUserChallengeByDate);
 
+// 특정 날짜의 일일 기록을 가져옴
+router.get('/:userId/daily-records', getDailyRecordByDate);
+
+// 사용자의 챌린지정보 업데이트
+router.post('/challenge', updateUserChallenge);
 export default router;

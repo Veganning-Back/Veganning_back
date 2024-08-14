@@ -2,7 +2,7 @@ import { getUserService, updateUserTargetsService } from '../services/userServic
 import { response } from '../../config/response.js';
 import { UserDTO } from '../dtos/UserDTO.js';
 
-// 사용자 정보를 조회하는 컨트롤러 함수
+// 사용자 정보를 조회
 export const getUser = async (req, res) => {
     try {
         const user = await getUserService(req.params.userId);
@@ -12,7 +12,7 @@ export const getUser = async (req, res) => {
     }
 };
 
-// 사용자의 목표 영양소 섭취량을 업데이트하는 컨트롤러 함수
+// 사용자의 목표 영양소 섭취량을 업데이트
 export const updateUserTargets = async (req, res) => {
     try {
         await updateUserTargetsService(req.params.userId, req.body);

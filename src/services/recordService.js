@@ -1,7 +1,7 @@
 import { addDailyRecord, getDailyRecordByDate } from '../models/recordModel.js';
 import { BaseError } from '../../config/error.js';
 
-// 새로운 일일 기록을 추가하는 서비스 함수
+// 새로운 일일 기록을 추가
 export const addDailyRecordService = async (data) => {
     const recordId = await addDailyRecord(data);
     if (!recordId) {
@@ -10,7 +10,7 @@ export const addDailyRecordService = async (data) => {
     return recordId;
 };
 
-// 특정 날짜에 해당하는 일일 기록을 조회하는 서비스 함수
+// 특정 날짜에 해당하는 일일 기록을 조회
 export const getDailyRecordService = async (userId, date) => {
     const record = await getDailyRecordByDate(userId, date);
     if (!record) {
@@ -18,3 +18,5 @@ export const getDailyRecordService = async (userId, date) => {
     }
     return record;
 };
+
+
