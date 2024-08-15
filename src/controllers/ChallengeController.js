@@ -2,16 +2,16 @@ import {pool} from '../../config/db.config.js';
 
 // 사용자의 챌린지 목표를 업데이트하는 함수
 export const updateUserChallenge = async (req, res) => {
-    const { userId, target_carbs, target_protein, target_fat, target_cal } = req.body;
+    const { userId, target_carb, target_protein, target_fat, target_cal } = req.body;
 
-    if (!userId || target_carbs == null || target_protein == null || target_fat == null || target_cal == null) {
+    if (!userId || target_carb == null || target_protein == null || target_fat == null || target_cal == null) {
         return res.status(400).json({ isSuccess: false, code: 400, message: 'All fields are required' });
     }
 
     try {
         const result = await pool.query(`
-            UPDATE User SET target_carbs = ?, target_protein = ?, target_fat = ?, target_cal = ? WHERE userId = ?
-        `, [target_carbs, target_protein, target_fat, target_cal, userId]);
+            UPDATE user SET target_carb = ?, target_protein = ?, target_fat = ?, target_cal = ? WHERE userId = ?
+        `, [target_carb, target_protein, target_fat, target_cal, userId]);
 
         if (result.affectedRows === 0) {
             return res.status(404).json({ isSuccess: false, code: 404, message: 'User not found' });
@@ -47,4 +47,3 @@ export const getUserChallengeByDate = async (req, res) => {
         res.status(500).json({ isSuccess: false, code: 500, message: error.message });
     }
 };
-

@@ -19,4 +19,3 @@ export const getDailyRecordService = async (userId, date) => {
     return record;
 };
 
-

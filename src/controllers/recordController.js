@@ -1,6 +1,8 @@
 import { addDailyRecordService, getDailyRecordService } from '../services/recordService.js';
 import { pool } from '../../config/db.config.js';
 import { BaseError } from '../../config/error.js';
+import { UserDTO } from '../dtos/UserDTO.js';
+import { getUserTargetsService } from '../services/userService.js';
 
 // 새로운 일일 기록을 추가
 export const addDailyRecord = async (req, res) => {
@@ -37,6 +39,7 @@ export const getDailyRecordByDate = async (req, res) => {
     try {
         const { userId } = req.params;
         const { date } = req.query;  
+
         const record = await getDailyRecordService(userId, date);
         if (!record) {
             return res.status(404).json({
@@ -45,11 +48,22 @@ export const getDailyRecordByDate = async (req, res) => {
                 message: 'Record not found'
             });
         }
+
+        // 사용자 목표 정보 조회
+        const userTargets = await getUserTargetsService(userId);
+
+       // 일일 기록과 목표 정보를 포함하여 응답
         res.status(200).json({
             isSuccess: true,
             code: 200,
             message: 'Record fetched successfully',
-            data: record
+            data: {
+                ...record,
+                target_carb: userTargets.target_carb,
+                target_protein: userTargets.target_protein,
+                target_fat: userTargets.target_fat,
+                target_cal: userTargets.target_cal
+            }
         });
     } catch (error) {
         res.status(error.data?.code || 500).json({
@@ -61,8 +75,8 @@ export const getDailyRecordByDate = async (req, res) => {
 };
 
 // 목표 영양소를 계산
-export const calculateNutrients = (req, res) => {
-    const { target_carb, target_protein, target_fat } = req.body;
+export const calculateNutrients = async (req, res) => {
+    const { userId,target_carb, target_protein, target_fat } = req.body;
 
     if (target_carb == null || target_protein == null || target_fat == null) {
         return res.status(400).json({ isSuccess: false, code: 400, message: 'All fields are required' });
@@ -73,6 +87,19 @@ export const calculateNutrients = (req, res) => {
         const target_protein_cal = target_protein * 4; 
         const target_fat_cal = target_fat * 9; 
         const target_cal = target_carb_cal + target_protein_cal + target_fat_cal; 
+
+        // 데이터베이스에 저장
+        const [result] = await pool.query(`
+            INSERT INTO user (userId, name, target_carb, target_protein, target_fat, target_cal)
+            VALUES (?, ?, ?, ?, ?, ?)
+            ON DUPLICATE KEY UPDATE
+            name = VALUES(name),
+            target_carb = VALUES(target_carb),
+            target_protein = VALUES(target_protein),
+            target_fat = VALUES(target_fat),
+            target_cal = VALUES(target_cal)
+        `, [userId, 'defaultName', target_carb, target_protein, target_fat, target_cal]);
+        
 
         res.status(200).json({
             isSuccess: true,
@@ -89,5 +116,4 @@ export const calculateNutrients = (req, res) => {
         res.status(500).json({ isSuccess: false, code: 500, message: error.message });
     }
 };
-
 
