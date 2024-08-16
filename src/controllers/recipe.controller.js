@@ -2,7 +2,7 @@ import { saveImageToDB } from "../models/image.model.js";
 import { readImageFile } from "../../utils/fileHandler.js";
 import {addRecipeToDB,addIngredientToDB ,addCookingStepToDB,addSavningDB,deleteSavningDB
 } from "../models/recipe.model.js";
-import { getRecipesByIdDB,getRecipesByTypeDB,getRecipesByUserIdFromDB,//searchRecipesDB
+import { getRecipesByIdDB,getRecipesByTypeDB,getRecipesByUserIdFromDB,searchRecipesDB
 } from "../models/recipe.model.js";
 
 // AddRecipe 함수 정의
@@ -32,7 +32,7 @@ try {
    const newRecipeId = await addRecipeToDB({
       name,
       description,
-      image,
+      image:null,
       type,
       carbohydrate,
       calorie,
@@ -103,17 +103,17 @@ export const getRecipesById = async (req, res) => {
       return res.status(404).json({ message: "Recipe not found" });
    }
 
-   // 이미지 데이터를 Base64 문자열로 변환
-   if (recipe.image) {
-      recipe.image = recipe.image.toString("base64");
-   }
+   // // 이미지 데이터를 Base64 문자열로 변환
+   // if (recipe.image) {
+   //    recipe.image = recipe.image.toString("base64");
+   // }
 
-   recipe.cookingSteps = recipe.cookingSteps.map((step) => {
-      if (step.image) {
-         step.image = step.image.toString("base64");
-      }
-      return step;
-   });
+   // recipe.cookingSteps = recipe.cookingSteps.map((step) => {
+   //    if (step.image) {
+   //       step.image = step.image.toString("base64");
+   //    }
+   //    return step;
+   // });
 
    res.json(recipe);
    } catch (error) {
@@ -183,23 +183,26 @@ export const deleteSavning = async (req, res) => {
 };
 
 //레시피 검색
-// export const searchRecipes = async (req, res) => {
-// try {
-//    // 쿼리 파라미터에서 name 값을 가져옴
-//    const { name } = req.query;
+export const searchRecipes = async (req, res) => {
+try {
+  // 쿼리 파라미터에서 name 값을 가져옴
+   const { name } = req.query;
+   
+  if (!name) {
+    return res.status(400).json({ error: "검색어를 입력해주세요." });
+  }
 
-//    if (!name) {
-//       return res.status(400).json({ error: "검색어를 입력해주세요." });
-//    }
+   const recipes = await searchRecipesDB(name);
+   if (recipes.length === 0) {
+      return res.status(404).json({ message: "검색 결과가 없습니다." });
+   }
 
-//    // 서비스 함수 호출
-//    const recipes = await searchRecipesDB(name);
 
-//    // 검색 결과를 클라이언트에 반환
-//    return res.status(200).json(recipes);
-// } catch (error) {
-//    return res.status(500).json({ error: "서버 오류가 발생했습니다." });
-// }
-// };
+  // 검색 결과를 클라이언트에 반환
+  return res.status(200).json(recipes);
+} catch (error) {
+   return res.status(500).json({ error: "서버 오류가 발생했습니다." });
+}
+};
 
 
