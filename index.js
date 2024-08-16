@@ -6,7 +6,7 @@ dotenv.config();
 import express from "express";
 import { recipeRouter } from "./src/routes/recipes.route.js";
 import { recipeReviewRouter } from "./src/routes/recipesReview.route.js"
-import dbConfig from "./congfig/db.config.js";
+import dbConfig from "./config/db.config.js";
 
 const app = express();
 const port = process.env.PORT || 3000;

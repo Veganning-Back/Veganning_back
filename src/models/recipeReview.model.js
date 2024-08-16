@@ -1,4 +1,4 @@
-import db from "../../congfig/db.config.js";
+import db from "../../config/db.config.js";
 
 
 //레시피별 리뷰 리스트 조회

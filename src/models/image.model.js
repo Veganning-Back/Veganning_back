@@ -1,4 +1,4 @@
-import db from "../../congfig/db.config.js";
+import db from "../../config/db.config.js";
 export const saveImageToDB = async (imageData, tableName, id) => {
    try {
       const query = `UPDATE ?? SET image = ? WHERE id = ?`;

@@ -1,4 +1,4 @@
-import db from "../../congfig/db.config.js";
+import db from "../../config/db.config.js";
 
 
 export const modifyRecipeDB = async (
@@ -48,6 +48,10 @@ export const modifyRecipeDB = async (
             recipeId,
          ]
          );
+         if (image) {
+         const imageData = await readImageFile(image);
+         await saveImageToDB(imageData, "Recipe", recipeId);
+         }
       }
 
       // 재료 업데이트
@@ -79,6 +83,10 @@ export const modifyRecipeDB = async (
             step.step_number,
             step.description,
          ]);
+         if (step.image) {
+            const imageData = await readImageFile(step.image);
+            await saveImageToDB(imageData, "cookingStep", stepResult.insertId);
+         }
          await conn.query(
             "INSERT INTO cookingStep (recipe_id, step_number, description) VALUES ?",
             [stepValues]

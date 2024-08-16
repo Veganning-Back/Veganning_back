@@ -2,7 +2,7 @@
 import express from "express";
 import {
   AddRecipe,
-  getRecipesByType,getRecipesById,getMyRecipes,addSavning,deleteSavning,//searchRecipes
+  getRecipesByType,getRecipesById,getMyRecipes,addSavning,deleteSavning, searchRecipes
 } from "../controllers/recipe.controller.js";
 import { modifyRecipe } from "../controllers/recipeModify.controller.js"
 
@@ -13,6 +13,8 @@ recipeRouter.use((req, res, next) => {
   console.log(`Router incoming request: ${req.method} ${req.url}`);
   next();
 });
+//레시피 검색하기
+recipeRouter.get("/search", searchRecipes);
 
 //레시피 진입 화면 (레시피 리스트)
 recipeRouter.get("/", getRecipesByType);
@@ -35,5 +37,3 @@ recipeRouter.delete("/:recipeId/savning", deleteSavning);
 //내 공모 레시피 수정하기
 recipeRouter.patch("/:recipeId/modify", modifyRecipe);
 
-//레시피 검색하기
-//recipeRouter.get("/search", searchRecipes);

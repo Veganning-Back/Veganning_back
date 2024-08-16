@@ -1,13 +1,15 @@
-import fs from "fs";
-//이미지 파일 읽어 바이너리로 전환  
-export const readImageFile = (filePath) => {
-return new Promise((resolve, reject) => {
-   fs.readFile(filePath, (err, data) => {
-      if (err) {
-      reject(err);
-      } else {
-      resolve(data);
-      }
-   });
-});
+import path from "path";
+import fs from "fs/promises";
+
+const IMAGE_BASE_PATH = "/path/to/image/directory";
+
+export const readImageFile = async (filename) => {
+  const fullPath = path.join(IMAGE_BASE_PATH, filename);
+  try {
+    const data = await fs.readFile(fullPath);
+    return data;
+  } catch (error) {
+    console.error(`Error reading image file: ${fullPath}`, error);
+    throw error;
+  }
 };
