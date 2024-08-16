@@ -15,15 +15,18 @@ const {
    user_id,
 } = recipe;
 const [result] = await db.query(
-   "INSERT INTO Recipe (name, description, type, carbohydrate, calorie, protein, fat, user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+   "INSERT INTO Recipe (name, description, type, carbohydrate, calorie, protein, fat, user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
    [name, description, type, carbohydrate, calorie, protein, fat, user_id]
    );
    const recipeId = result.insertId;
+   
+   //레시피 생성후 이미지 별도 처리
    if (image) {
       const imageData = await readImageFile(image);
       await saveImageToDB(imageData, "Recipe", recipeId);
    }
-return recipeId; // 생성된 레시피 ID 반환
+
+return recipeId;
 
 
 };
