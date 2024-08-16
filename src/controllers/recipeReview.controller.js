@@ -87,6 +87,7 @@ res.status(201).json({
 }
 };
 
+//레시피 상세 조회 하단 리뷰 카드 
 export const getRecipeCard = async (req, res) => {
    try {
       const recipeId = parseInt(req.params.recipeId);

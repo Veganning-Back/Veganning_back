@@ -19,7 +19,7 @@ const [result] = await db.query(
    [name, description, type, carbohydrate, calorie, protein, fat, user_id]
    );
    const recipeId = result.insertId;
-   
+
    //레시피 생성후 이미지 별도 처리
    if (image) {
       const imageData = await readImageFile(image);
@@ -285,9 +285,17 @@ export const searchRecipesDB = async (searchTerm) => {
    try {
    const query = `
       SELECT r.id, r.name, r.description, r.image, 
-            GROUP_CONCAT(DISTINCT cs.description ORDER BY cs.step_number ASC SEPARATOR '||') AS cooking_steps
+            GROUP_CONCAT(
+               DISTINCT CONCAT(cs.step_number, ':', cs.description)
+               ORDER BY cs.step_number ASC
+               SEPARATOR '||'
+               ) AS cooking_steps
       FROM Recipe r
-      LEFT JOIN cookingStep cs ON r.id = cs.recipe_id
+      LEFT JOIN (
+        SELECT recipe_id, step_number, description
+        FROM cookingStep
+        WHERE step_number <= 2  
+      ) cs ON r.id = cs.recipe_id
       WHERE r.name LIKE ?
       GROUP BY r.id
       LIMIT 10
@@ -301,7 +309,10 @@ export const searchRecipesDB = async (searchTerm) => {
           ...row,
           description: row.description.split(".")[0] + ".",
           cooking_steps: row.cooking_steps
-            ? row.cooking_steps.split("||").slice(0, 2) //2개까지만
+            ? row.cooking_steps.split("||").map((step) => {
+                const [stepNumber, description] = step.split(":");
+                return { step_number: parseInt(stepNumber), description };
+              })
             : [],
           image: image ? image.toString("base64") : null,
         };
