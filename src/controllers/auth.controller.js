@@ -120,3 +120,61 @@ export const loginUser = async (req, res) => {
         });
     }
 };
+
+
+// 사용자 이름 및 비건 설정 날짜 설정
+export const settingUser = async (req, res) => {
+    const { id } = req.params; // 사용자 ID를 URL에서 가져옴
+    const { name, start_vegan } = req.body; // 요청 본문에서 사용자 이름과 비건 설정 날짜를 가져옴
+
+    // 필수 필드 검증
+    if (!name || !start_vegan) {
+        return res.status(400).json({
+            status: 400,
+            success: false,
+            message: 'Name and start_vegan date are required',
+            data: {}
+        });
+    }
+
+    const connection = await db.getConnection(); // 데이터베이스 커넥션 가져오기
+    try {
+        await connection.beginTransaction(); // 트랜잭션 시작
+
+        // 사용자 정보 업데이트
+        const [result] = await connection.query(
+            'UPDATE user SET name = ?, start_vegan = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
+            [name, start_vegan, id]
+        );
+
+        if (result.affectedRows === 0) {
+            await connection.rollback(); // 롤백
+            return res.status(404).json({
+                status: 404,
+                success: false,
+                message: 'User not found',
+                data: {}
+            });
+        }
+
+        await connection.commit(); // 트랜잭션 커밋
+
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: 'User settings updated successfully',
+            data: {}
+        });
+    } catch (error) {
+        await connection.rollback(); // 오류 발생 시 롤백
+        console.error('Database error:', error);
+        res.status(500).json({
+            status: 500,
+            success: false,
+            message: 'Failed to update user settings',
+            data: {}
+        });
+    } finally {
+        connection.release(); // 커넥션 해제
+    }
+};
