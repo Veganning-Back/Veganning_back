@@ -65,13 +65,13 @@ export const updateUser = async (req, res) => {
     try {
         await connection.beginTransaction(); // 트랜잭션 시작
 
-        // 사용자 정보 업데이트
+        // 사용자 정보 업데이트 및 updated_at 필드 업데이트
         const result = await connection.query(
-            'UPDATE user SET type = ? WHERE id = ?',
+            'UPDATE user SET type = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
             [vegan_level, id]
         );
 
-        if (result.affectedRows === 0) {
+        if (result[0].affectedRows === 0) {
             await connection.rollback(); // 롤백
             return res.status(404).json({
                 status: 404,
@@ -82,34 +82,38 @@ export const updateUser = async (req, res) => {
         }
 
         if (prefer_ingredients.length > 0) {
-            // 기존의 모든 prefer_user 레코드를 삭제합니다.
+            // 기존의 모든 prefer-user 레코드를 삭제합니다.
             await connection.query(
-                'DELETE FROM prefer_user WHERE userId = ?',
+                'DELETE FROM `prefer-user` WHERE user_id = ?',
                 [id]
             );
-        
-            // 요청 body에 포함된 prefer_ingredients만 삽입합니다.
-            await connection.query(
-                'INSERT INTO prefer_user (id, tagId, userId) SELECT NULL, id, ? FROM ingredient_tag WHERE name IN (?)',
-                [id, prefer_ingredients]
-            );
+            
+            // 요청 body에 포함된 prefer_ingredients를 각각 삽입합니다.
+            const insertPreferQuery = `
+            INSERT INTO \`prefer-user\` (id, tag_id, user_id)
+            SELECT NULL, id, ? FROM ingredient_tag WHERE name = ?`;
+
+            for (const ingredient of prefer_ingredients) {
+                await connection.query(insertPreferQuery, [id, ingredient]);
+            }
         }
         
         if (dislike_ingredients.length > 0) {
-            // 기존의 모든 dislike_user 레코드를 삭제합니다.
+            // 기존의 모든 dislike-user 레코드를 삭제합니다.
             await connection.query(
-                'DELETE FROM dislike_user WHERE userId = ?',
+                'DELETE FROM `dislike-user` WHERE user_id = ?',
                 [id]
             );
-        
-            // 요청 body에 포함된 dislike_ingredients만 삽입합니다.
-            await connection.query(
-                'INSERT INTO dislike_user (id, tagId, userId) SELECT NULL, id, ? FROM ingredient_tag WHERE name IN (?)',
-                [id, dislike_ingredients]
-            );
-        }
-        
+            
+            // 요청 body에 포함된 dislike_ingredients를 각각 삽입합니다.
+            const insertDislikeQuery = `
+            INSERT INTO \`dislike-user\` (id, tag_id, user_id)
+            SELECT NULL, id, ? FROM ingredient_tag WHERE name = ?`;
 
+            for (const ingredient of dislike_ingredients) {
+                await connection.query(insertDislikeQuery, [id, ingredient]);
+            }
+        }
 
         await connection.commit(); // 트랜잭션 커밋
 
@@ -132,6 +136,7 @@ export const updateUser = async (req, res) => {
         connection.release(); // 커넥션 해제
     }
 };
+
 
 // 사용자가 저장한 식단 정보를 가져오는 함수
 export const savening_Recipe = async (req, res) => {

@@ -8,7 +8,7 @@ myPageRouter.get('/', myPageTest);
 
 myPageRouter.get('/:id', myPageHandler);
 
-myPageRouter.put('/:id/update', updateUser);
+myPageRouter.put('/:id/onboard', updateUser);
 
 myPageRouter.get('/:id/savening_Recipe', savening_Recipe);
 myPageRouter.get('/:id/savening_Restaurant', savening_Restaurant);
