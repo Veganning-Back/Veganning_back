@@ -83,8 +83,8 @@ try {
 //타입별로 레시피 목록 가져오기
 export const getRecipesByType = async (req, res) => {
    try {
-     const { type } = req.query; // 쿼리 파라미터에서 type을 추출
-     const recipes = await getRecipesByTypeDB(type); // 데이터베이스에서 해당 타입의 레시피를 가져옴
+     const { type, fromrecruit } = req.query; // 쿼리 파라미터에서 type을 추출
+     const recipes = await getRecipesByTypeDB(type,fromrecruit ==='true'); // 데이터베이스에서 해당 타입의 레시피를 가져옴
      res.status(200).json(recipes);
    } catch (error) {
       console.error("Error fetching recipes by type:", error);

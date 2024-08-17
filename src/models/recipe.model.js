@@ -59,7 +59,7 @@ const [result] =await db.query(
 };
 
 //타입별 레시피 이름,순서2개,이미지 가져오기
-export const getRecipesByTypeDB = async (type) => {
+export const getRecipesByTypeDB = async (type,fromrecruit = false) => {
    try {
      const query = `
       SELECT 
@@ -78,6 +78,7 @@ export const getRecipesByTypeDB = async (type) => {
          Recipe.id = cs.recipe_id
          WHERE 
          Recipe.type = ?
+         ${fromrecruit ? "AND Recipe.id >= 9" : ""}
          ORDER BY 
          Recipe.id, cs.step_number;
       `;
