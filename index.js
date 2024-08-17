@@ -19,8 +19,8 @@ app.use('/home', homeRouter);
 //STORE 관련기능
 app.use('/stores', storeRouter);
 
-//회원가입, 로그인기능
-// app.use('/auth', authRouter);
+
+
 
 
 app.use((req, res, next) => {

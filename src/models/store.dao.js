@@ -1,12 +1,13 @@
 import { pool } from "../../config/db.config.js";
 import { getHotStoreQuery, 
-    getStoreInfoQuery, getStoreReviewPhotoQuery, getStoreMenuQuery, getIsHotQuery, getStoreRateQuery, getReviewCountQuery, 
-    addReviewQuery, updateStoreRatingQuery } from "./store.sql.js";
+    getStoreInfoQuery, getStoreImageQuery , getStoreMenuQuery, getIsHotQuery, getStoreRateQuery, getReviewCountQuery, 
+    addReviewQuery, updateStoreRatingQuery, getReviewQuery, updateAvgRatingQuery,
+    savningStoreQuery, getStoreImageListQuery } from "./store.sql.js";
 import { isStoreOpen, getOpenCloseColumns } from "./module.js";
 
 
 //(3.4 / 3.4.2 / 3.4.3)
-export const getHotStoreList = async (cursorId, region, type, limit) => {
+export const getHotStoreList = async (region, type) => {
     try {
         const conn = await pool.getConnection();
         
@@ -16,23 +17,24 @@ export const getHotStoreList = async (cursorId, region, type, limit) => {
         // region을 배열로 처리
         const regions = region ? region.split(',') : [];
         const regionParams = regions.map(region => `%${region}%`);
-
+        // console.log(openCloseColumns, region, type);
         // SQL 쿼리 생성
-        const query = getHotStoreQuery(cursorId, regions, type, openCloseColumns);
+        const query = getHotStoreQuery(regions, type, openCloseColumns);
+        
         const params = [
             ...regionParams,
             type ? type : null,
-            cursorId ? parseInt(cursorId, 10) : null,
-            parseInt(limit, 10)
+            //cursorId ? parseInt(cursorId, 10) : null,
+            //parseInt(limit, 10)
         ].filter(param => param !== null); // null 값을 제외한 파라미터만 전달
 
-        // console.log("SQL Query:", query);
+        console.log("SQL Query:", query);
         // console.log("Params:", params);
 
         const [storeRows] = await conn.query(query, params);
-
+        console.log(storeRows);
+        // console.log(storeRows);
         
-
         const hotStoreList = storeRows.map(store => ({
             id: store.id,
             name: store.name,
@@ -43,6 +45,7 @@ export const getHotStoreList = async (cursorId, region, type, limit) => {
             image: store.image
         }));
 
+        
         conn.release();
         
         return hotStoreList;
@@ -69,13 +72,13 @@ export const getStoreById = async (storeId) => {
         const storeData = storeInfoRows[0];
 
         // 사진 리뷰에 있는 사진 6개 가져오기
-        const [photoRows] = await conn.query(getStoreReviewPhotoQuery, [storeId]);
+        const [photoRows] = await conn.query(getStoreImageQuery, [storeId]);
         
         const photoList = photoRows.length > 0 ? photoRows : [];
 
         // 메뉴 가져오기
         const [menuRows] = await conn.query(getStoreMenuQuery, [storeId]);
-        
+        console.log(menuRows);
         const menuList = menuRows.length > 0 ? menuRows : [];
 
         // 해당 가게가 hot 상태인지 확인
@@ -164,20 +167,95 @@ export const addReviewDAO = async (storeId, userId, image, rating, body) => {
 };
 
 // 가게 평점 업데이트 DAO
-export const updateStoreRatingDAO = async (storeId) => {
+export const updateStoreRatingDAO = async (storeId, rating) => {
     const conn = await pool.getConnection();
 
     try {
-        const [ratings] = await conn.query("SELECT rating FROM store_review WHERE store_id = ?", [storeId]);
+        await conn.beginTransaction();
 
-        const totalRatings = ratings.length;
-        const sumRatings = ratings.reduce((acc, curr) => acc + curr.rating, 0);
-        const avgRating = (sumRatings / totalRatings).toFixed(2);
+        // 첫 번째 쿼리: 특정 rating 카운트를 증가
+        const updateRatingQuery = updateStoreRatingQuery(rating);
+        await conn.query(updateRatingQuery, [storeId]);
 
-        await conn.query(updateStoreRatingQuery, [avgRating, storeId]);
+        // 두 번째 쿼리: 평균 값을 계산하여 업데이트
+        const avgQuery = updateAvgRatingQuery();
+        await conn.query(avgQuery, [storeId, storeId]);
+
+        await conn.commit();
     } catch (error) {
+        await conn.rollback();
         throw error;
     } finally {
         conn.release();
+    }
+};
+//-------------------------------------------------------------------------
+
+//식당 리뷰리스트
+//(3.6.10 / 3.7 / 3.7.6)
+export const getStoreReivewList = async (storeId, order) => {
+    try{
+        const conn = await pool.getConnection();
+
+        
+        const [reviewRows] = await conn.query(getReviewQuery(order), storeId); //리뷰객체배열
+        
+        
+        const storeReviewList = reviewRows.map(review => ({
+            name: review.name,
+            rate: review.rate,
+            created_at: review.created_at,
+            body: review.body
+        }));
+        
+        
+        conn.release();
+
+        return storeReviewList;
+
+    }catch{
+        console.log("dao실행 안되는 중");
+
+    }
+};
+
+
+
+//식당 세이브닝
+//(3.9.6)
+export const savningStoreDAO = async (storeId, userId) => {
+    const conn = await pool.getConnection();
+
+    try{
+        
+        await conn.query(savningStoreQuery(storeId, userId));
+
+        return ;
+    }
+    catch{
+        console.log("DAO파일 안되는 중");
+        throw error;
+    }finally{
+        conn.release;
+    }
+};
+
+
+
+//식당 사진리스트
+//(3.8)
+export const showStoreImageListDAO = async (storeId) => {
+    const conn = await pool.getConnection();
+    
+    try{
+        const [imageRows] = await conn.query(getStoreImageListQuery, [storeId]);
+        
+
+        return imageRows;
+    }catch{
+        console.log("dao 실행안됨");
+
+    }finally{
+        conn.release;
     }
 };

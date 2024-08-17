@@ -40,3 +40,16 @@ export const formatDate = (date) => {
     const dd = String(date.getDate()).padStart(2, '0');
     return yy + mm + dd;
 };
+
+//2024.08.12 (월) 형태로 변환
+const daysOfWeek = ['일', '월', '화', '수', '목', '금', '토'];
+
+export const formatDateWithDay = (dateString) => {
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // 월은 0부터 시작하므로 +1
+    const day = String(date.getDate()).padStart(2, '0');
+    const dayOfWeek = daysOfWeek[date.getDay()]; // 요일 가져오기
+
+    return `${year}.${month}.${day} (${dayOfWeek})`;
+};
