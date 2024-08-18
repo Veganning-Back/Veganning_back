@@ -1,13 +1,13 @@
 import db from "../../config/db.config.js";
 export const saveImageToDB = async (imageData, tableName, id) => {
-   try {
-      const query = `UPDATE ?? SET image = ? WHERE id = ?`;
-      await db.query(query, [tableName, imageData, id]);
-      console.log("Image saved successfully!");
-   } catch (error) {
-      console.error("Error saving image to DB:", error);
-      throw error;
-   }
+  try {
+    const query = `UPDATE ?? SET image = ? WHERE id = ?`;
+    await db.query(query, [tableName, imageData, id]);
+    console.log("Image saved successfully!");
+  } catch (error) {
+    console.error("Error saving image to DB:", error);
+    throw error;
+  }
 };
 
 
