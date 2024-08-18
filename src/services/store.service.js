@@ -104,7 +104,7 @@ export const showStoreReviewListService = async (storeId, order) => {
 export const savningStoreService = async (user_id, store_id) =>{
     
     try{
-        await savningStoreDAO(user_id, store_id);
+        await savningStoreDAO(store_id, user_id );
 
         return ;
     }

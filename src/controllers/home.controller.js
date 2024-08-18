@@ -1,7 +1,7 @@
 import { response } from "../../config/response.js";
 import { status } from "../../config/response.status.js";
 import { hotStores } from "../services/home.service.js";
-import { recommendRecipesService } from "../services/home.service.js";
+import { recommendRecipesService, hotRecipe } from "../services/home.service.js";
 
 
 //(3.1.1 / 3.1.2 / 3.1.3)
@@ -46,4 +46,19 @@ export const showHotStores = async (req, res, next) => {
         console.error(error);
         return res.status(500).json(response(status.INTERNAL_SERVER_ERROR, {}));
     }
+};
+
+
+//(3.1.6)
+export const showHotRecipe = async (req, res) => {
+    try{
+        const result = await hotRecipe();
+        
+        return res.status(200).json(result);
+
+        
+    }catch{
+        console.log("컨트롤러에서 안됨");
+    }
+
 };

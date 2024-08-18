@@ -99,10 +99,10 @@ export const showStoreReviewList = async (req, res) => {
 export const savningStore = async (req, res) => {
     try{
         const {user_id, store_id} = req.body;
+        console.log(user_id, store_id);
+        await savningStoreService(user_id, store_id);
 
-        const result = await savningStoreService(user_id, store_id);
-
-        return res.status(200).json(response(status.SUCCESS, "세이브닝 성공", result));
+        return res.status(200).json(response(status.SUCCESS, "세이브닝 성공"));
         
 
     }catch{

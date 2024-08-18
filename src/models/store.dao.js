@@ -228,8 +228,10 @@ export const savningStoreDAO = async (storeId, userId) => {
 
     try{
         
-        await conn.query(savningStoreQuery(storeId, userId));
-
+        // console.log(savningStoreQuery(storeId, userId));
+        
+        await conn.query(savningStoreQuery(storeId, userId),);
+        
         return ;
     }
     catch{

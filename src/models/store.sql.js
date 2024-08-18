@@ -228,9 +228,13 @@ export const getReviewQuery = (order) => {
 //식당 세이브닝
 //(3.9.6)
 
-export const savningStoreQuery = (storeId, userId) => `
-    INSERT INTO store_savning (store_id, user_id) VALUES (${storeId}, ${userId})
+export const savningStoreQuery = (storeId, userId) => {
+    
+
+    return `
+    INSERT INTO store_savning (user_id, store_id ) VALUES (${userId}, ${storeId});
 `;
+}
 
 
 

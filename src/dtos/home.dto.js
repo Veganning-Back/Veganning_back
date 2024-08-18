@@ -8,7 +8,7 @@ export const recommendRecipesResponseDTO = (todayDate, data) => {
     const formattedRecipe = {
         recipe_id: recipe.id,
         recipe_name: recipe.name,
-        image: recipe.image,
+        image: recipe.image ? Buffer.from(recipe.image).toString('base64') : null,
         user_name: data.user.name,
         date: todayDate,
         d_day: data.user.d_plus_day
@@ -16,7 +16,7 @@ export const recommendRecipesResponseDTO = (todayDate, data) => {
 
     return {
         status: "SUCCESS",
-        data: [formattedRecipe] // 배열로 반환
+        data: formattedRecipe // 배열로 반환
     };
 };
 
@@ -36,8 +36,8 @@ export const showHotStoresResponseDTO = (storeData) => {
             "open": storeData[i].open,
             "rating": storeData[i].rating,
             "isOpen": storeData[i].isOpen,   //open테이블 조인해서 요일판별후 해당구간에 시간
-            "image": storeData[i].image
-
+            "image": storeData[i].image ? Buffer.from(storeData[i].image).toString('base64') : null
+            
         })
     }
 

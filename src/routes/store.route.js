@@ -27,12 +27,12 @@ storeRouter.post("/reviews/:a", asyncHandler(addStoreReview));  //엔드포인�
 
 //식당 리뷰 무한스크롤
 //(3.6.10 / 3.7 / 3.7.6)
-storeRouter.get('/:storeId/review-list', asyncHandler(showStoreReviewList));
+storeRouter.get('/review-list/:storeId', asyncHandler(showStoreReviewList));
 
 
 //식당 세이브닝
 //(3.9.6)
-storeRouter.post("/savning/:aa", asyncHandler(savningStore));
+storeRouter.post("/savning-store/:aa", asyncHandler(savningStore));
 
 
 //식당 사진리스트
