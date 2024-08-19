@@ -51,6 +51,28 @@ export const getDailyRecordByDate = async (req, res) => {
 
         // 사용자 목표 정보 조회
         const userTargets = await getUserTargetsService(userId);
+         // 현재 일일 기록의 총 칼로리 계산
+         const totalCalories = record.today_carbs + record.today_protein + record.today_fat;
+         // 목표 달성률 계산
+        let achievementRate = 0;
+        if (totalCalories >= userTargets.target_cal) {
+            achievementRate = 1;
+        } else if (totalCalories >= userTargets.target_cal * 0.7) {
+            achievementRate = 0.7;
+        } else if (totalCalories >= userTargets.target_cal * 0.5) {
+            achievementRate = 0.5;
+        }
+
+        // 비율 계산 (today/target)
+        const carbsRatio = (record.today_carbs / userTargets.target_carb).toFixed(2);
+        const proteinRatio = (record.today_protein / userTargets.target_protein).toFixed(2);
+        const fatRatio = (record.today_fat / userTargets.target_fat).toFixed(2);
+
+        // stamp에 목표 달성률 추가
+        const updatedRecord = {
+            ...record,
+            stamp: achievementRate
+        };
 
        // 일일 기록과 목표 정보를 포함하여 응답
         res.status(200).json({
@@ -58,11 +80,14 @@ export const getDailyRecordByDate = async (req, res) => {
             code: 200,
             message: 'Record fetched successfully',
             data: {
-                ...record,
+                ...updatedRecord,
                 target_carb: userTargets.target_carb,
                 target_protein: userTargets.target_protein,
                 target_fat: userTargets.target_fat,
-                target_cal: userTargets.target_cal
+                target_cal: userTargets.target_cal,
+                carbs_ratio: carbsRatio,
+                protein_ratio: proteinRatio,
+                fat_ratio: fatRatio
             }
         });
     } catch (error) {
