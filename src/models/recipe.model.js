@@ -15,7 +15,7 @@ const {
    user_id,
 } = recipe;
 const [result] = await db.query(
-   "INSERT INTO Recipe (name, description, type, carbohydrate, calorie, protein, fat, user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+   "INSERT INTO recipe (name, description, type, carbohydrate, calorie, protein, fat, user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
    [name, description, type, carbohydrate, calorie, protein, fat, user_id]
    );
    const recipeId = result.insertId;
@@ -23,7 +23,7 @@ const [result] = await db.query(
    //레시피 생성후 이미지 별도 처리
    if (image) {
       const imageData = await readImageFile(image);
-      await saveImageToDB(imageData, "Recipe", recipeId);
+      await saveImageToDB(imageData, "recipe", recipeId);
    }
 
 return recipeId;
@@ -63,55 +63,50 @@ export const getRecipesByTypeDB = async (type,fromrecruit = false) => {
    try {
      const query = `
       SELECT 
-         Recipe.id,
-         Recipe.name,
-         Recipe.image,
-         cs.step_number,
-         cs.description
-         FROM 
-         Recipe
-         JOIN 
-         (SELECT recipe_id, step_number, description 
-            FROM cookingStep 
-            WHERE step_number <= 2) as cs
-         ON 
-         Recipe.id = cs.recipe_id
-         WHERE 
-         Recipe.type = ?
-         ${fromrecruit ? "AND Recipe.id >= 9" : ""}
-         ORDER BY 
-         Recipe.id, cs.step_number;
+         r.id,
+      r.name,
+      r.image,
+      GROUP_CONCAT(
+         CONCAT(cs.step_number, ':', cs.description)
+         ORDER BY cs.step_number ASC
+         SEPARATOR '||'
+         ) AS cooking_steps
+      FROM 
+         recipe r
+      LEFT JOIN 
+         cookingStep cs ON r.id = cs.recipe_id
+      WHERE 
+         r.type = ?
+         ${fromrecruit ? "AND r.id >= 9" : ""}
+      GROUP BY
+         r.id
+      ORDER BY 
+         r.id;
       `;
 
       const [rows] = await db.query(query, [type]);
 
-      //반환값 구조
-      const recipes = {};
-      for (const row of rows) {
-      if (!recipes[row.id]) {
-         const image = await getImageFromDB("Recipe", row.id);
-         recipes[row.id] = {
+      const recipes = await Promise.all(
+        rows.map(async (row) => {
+          const image = await getImageFromDB("recipe", row.id);
+          const cookingSteps = row.cooking_steps
+            ? row.cooking_steps.split("||").map((step) => {
+                const [step_number, description] = step.split(":");
+                return { step_number: parseInt(step_number), description };
+              })
+            : [];
+
+          return {
             id: row.id,
             name: row.name,
             image: image ? image.toString("base64") : null,
-            step_number_1: null,
-            description_1: null,
-            step_number_2: null,
-            description_2: null,
-         };
-      }
-      if (row.step_number === 1) {
-         recipes[row.id].step_number_1 = row.step_number;
-         recipes[row.id].description_1 = row.description;
-      }
-      if (row.step_number === 2) {
-         recipes[row.id].step_number_2 = row.step_number;
-         recipes[row.id].description_2 = row.description;
-      }
-      }
-      console.log("Query result:", rows); // 결과 로그 추가
-      // 객체를 배열로 변환하여 반환
-      return Object.values(recipes);
+            cookingSteps: cookingSteps.slice(0, 2), // 처음 2개의 요리 단계만 포함
+          };
+        })
+      );
+
+      console.log("Processed recipes:", recipes);
+      return recipes;
 
    } catch (error) {
       console.error("Error in getRecipesFromDB:", error);
@@ -133,7 +128,7 @@ try {
       r.fat,
       r.average_rating
       FROM 
-      Recipe r
+      recipe r
       WHERE 
       r.id = ?;
    `;
@@ -170,7 +165,7 @@ try {
    }
 
    const recipe = recipeRows[0];
-   recipe.image = await getImageFromDB("Recipe", recipeId);
+   recipe.image = await getImageFromDB("recipe", recipeId);
    recipe.ingredients = ingredientRows;
    recipe.cookingSteps = await Promise.all(
       stepRows.map(async (step) => {
@@ -200,7 +195,7 @@ try {
                cs.step_number,
                cs.description
             FROM 
-               Recipe r
+               recipe r
             JOIN 
                (SELECT recipe_id, step_number, description, image 
                FROM cookingStep 
@@ -291,7 +286,7 @@ export const searchRecipesDB = async (searchTerm) => {
                ORDER BY cs.step_number ASC
                SEPARATOR '||'
                ) AS cooking_steps
-      FROM Recipe r
+      FROM recipe r
       LEFT JOIN (
         SELECT recipe_id, step_number, description
         FROM cookingStep
@@ -305,7 +300,7 @@ export const searchRecipesDB = async (searchTerm) => {
 
     const recipes = await Promise.all(
       rows.map(async (row) => {
-        const image = await getImageFromDB("Recipe", row.id);
+        const image = await getImageFromDB("recipe", row.id);
         return {
           ...row,
           description: row.description.split(".")[0] + ".",
