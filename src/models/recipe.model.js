@@ -117,65 +117,46 @@ export const getRecipesByTypeDB = async (type,fromrecruit = false) => {
 //recipe_id에 따른 레시피 상세 조회
 export const getRecipesByIdDB = async (recipeId) => {
 try {
-   const recipeQuery = `
-      SELECT 
-      r.name,
-      r.description,
-      r.type,
-      r.carbohydrate,
-      r.calorie,
-      r.protein,
-      r.fat,
-      r.average_rating
-      FROM 
-      recipe r
-      WHERE 
-      r.id = ?;
-   `;
-
-   const ingredientsQuery = `
-      SELECT 
-      i.name,
-      i.quantity
-      FROM 
-      ingredients i
-      WHERE 
-      i.recipe_id = ?;
-   `;
-
-   const stepsQuery = `
-      SELECT 
-      cs.step_number,
-      cs.description
-      FROM 
-      cookingStep cs
-      WHERE 
-      cs.recipe_id = ?
-      ORDER BY
-      cs.step_number;
-   `;
-
-   const [recipeRows] = await db.query(recipeQuery, [recipeId]);
-   const [ingredientRows] = await db.query(ingredientsQuery, [recipeId]);
-   const [stepRows] = await db.query(stepsQuery, [recipeId]);
-   
+   const [recipeRows] = await db.query(
+     `
+      SELECT id, name, description, type, carbohydrate, calorie, protein, fat, average_rating, image
+      FROM recipe
+      WHERE id = ?
+    `,
+     [recipeId]
+   );
 
    if (recipeRows.length === 0) {
-      return null;
+     return null;
    }
 
    const recipe = recipeRows[0];
-   recipe.image = await getImageFromDB("recipe", recipeId);
-   recipe.ingredients = ingredientRows;
-   recipe.cookingSteps = await Promise.all(
-      stepRows.map(async (step) => {
-      const stepImage = await getImageFromDB("cookingStep", step.id);
-      return {
-         ...step,
-         image: stepImage ? stepImage.toString("base64") : null,
-      };
-      })
+
+   const [ingredientRows] = await db.query(
+     `
+      SELECT name, quantity
+      FROM ingredients
+      WHERE recipe_id = ?
+    `,
+     [recipeId]
    );
+
+   const [stepRows] = await db.query(
+     `
+      SELECT id, step_number, description, image
+      FROM cookingStep
+      WHERE recipe_id = ?
+      ORDER BY step_number
+    `,
+     [recipeId]
+   );
+
+   recipe.image = recipe.image ? recipe.image.toString("base64") : null;
+   recipe.ingredients = ingredientRows;
+   recipe.cookingSteps = stepRows.map((step) => ({
+     ...step,
+     image: step.image ? step.image.toString("base64") : null,
+   }));
 
    return recipe;
 } catch (error) {
