@@ -94,7 +94,7 @@ export const getRecipeCardDB = async (recipeId, limit = 3) => {
         r.created_at,
         u.name as userName
       FROM recipe_review r
-      JOIN User u ON r.user_id = u.id
+      JOIN user u ON r.user_id = u.id
       WHERE r.recipe_id = ?
       ORDER BY r.created_at DESC`,
     [recipeId]
