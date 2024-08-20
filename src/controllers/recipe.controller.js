@@ -44,7 +44,7 @@ try {
    //이미지 저장
    if (image) {
       const imageData = await readImageFile(image);
-      await saveImageToDB(imageData, "Recipe", newRecipeId);
+      await saveImageToDB(imageData, "recipe", newRecipeId);
    }
 
    // 재료 추가
