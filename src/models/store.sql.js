@@ -194,6 +194,7 @@ export const updateAvgRatingQuery = () => {
 //(3.6.10 / 3.7 / 3.7.6)
 export const getReviewQuery = (order) => {
     let orderByClause;
+    console.log(order);
     switch (order) {
         case 'high':
             orderByClause = 'ORDER BY sr.rating DESC';

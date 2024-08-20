@@ -197,6 +197,7 @@ export const getStoreReivewList = async (storeId, order) => {
     try{
         const conn = await pool.getConnection();
 
+        console.log(getReviewQuery(order));
         
         const [reviewRows] = await conn.query(getReviewQuery(order), storeId); //리뷰객체배열
         
