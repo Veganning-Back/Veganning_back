@@ -6,20 +6,24 @@ export const getUserData = () => `
 `;
 
 //필터 거친 추천레시피 1개 리턴
+// 필터 거친 추천 레시피 5개 리턴
 export const getRecommendationQuery = (placeholders, ingredientCount) => `
     SELECT r.id, r.name, r.image 
     FROM recipe r
     JOIN ingredients i ON r.id = i.recipe_id
     WHERE i.name IN (${placeholders})
     GROUP BY r.id
-    HAVING COUNT(DISTINCT i.name) = ${ingredientCount};
+    HAVING COUNT(DISTINCT i.name) = ${ingredientCount}
+    LIMIT 5;
 `;
-//랜덤 레시피 1개 리턴
+
+// 랜덤 레시피 5개 리턴
 export const getRandomRecipe = () => `
     SELECT id, name, image FROM recipe
     ORDER BY RAND()
-    LIMIT 1;
+    LIMIT 5; 
 `;
+
 //-------------------------------------------------------------------------
 
 //3.1.4

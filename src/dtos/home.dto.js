@@ -1,24 +1,21 @@
 //(3.1.1 / 3.1.2 / 3.1.3)
 export const recommendRecipesResponseDTO = (todayDate, data) => {
-    // 랜덤으로 추천 레시피 중 하나 선택
-    const randomIndex = Math.floor(Math.random() * data.recommend.length);
-    const recipe = data.recommend[randomIndex];
-
-    // 레시피 데이터 형식 변환
-    const formattedRecipe = {
+    // 추천 레시피 배열에서 5개를 모두 반환
+    const formattedRecipes = data.recommend.map(recipe => ({
         recipe_id: recipe.id,
         recipe_name: recipe.name,
         image: recipe.image ? Buffer.from(recipe.image).toString('base64') : null,
         user_name: data.user.name,
         date: todayDate,
         d_day: data.user.d_plus_day
-    };
+    }));
 
     return {
-        status: "SUCCESS",
-        data: formattedRecipe // 배열로 반환
+        
+        data: formattedRecipes // 배열로 반환
     };
 };
+
 
 
 // (3.1.4)세이브닝 개수가 가장 많은 4개의 식당 정보 리턴
