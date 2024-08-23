@@ -1,5 +1,6 @@
 # Veganning_back
 
+24년 UMC 6th Veganning 데모데이 출품작
 
 ![image](https://github.com/user-attachments/assets/846091ab-6fed-4d62-a41e-999e9b4c414e)
 ![image](https://github.com/user-attachments/assets/471aec9d-784f-4187-821c-78b9d966db3b)
